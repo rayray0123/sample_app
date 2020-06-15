@@ -40,3 +40,4 @@ source 'https://rubygems.org'
 
 gem 'rails',          '5.1.6'
 gem 'bootstrap-sass', '3.3.7'
+gem 'bcrypt',         '3.1.12'
