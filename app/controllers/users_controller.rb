@@ -3,8 +3,13 @@ class UsersController < ApplicationController
   before_action :correct_user,   only: [:edit, :update]
   before_action :admin_user,     only: :destroy
   
+  def index
+    @users = User.where(activated: true).paginate(page: params[:page])
+  end
+
   def show
     @user = User.find(params[:id])
+    redirect_to root_url and return unless @user.activated?
   end
   
   def new
@@ -15,9 +20,9 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       # 保存の成功をここで扱う。
-      log_in @user
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
+      @user.send_activation_email
+      flash[:info] = "Please check your email to activate your account."
+      redirect_to root_url
     else
       render 'new'
     end
@@ -61,20 +66,23 @@ class UsersController < ApplicationController
       redirect_to(root_url) unless current_user?(@user)
     end
     
-  def index
     def index
-    @users = User.paginate(page: params[:page])
+    @users = User.where(activated: true).paginate(page: params[:page])
     end
-  end
+
+    def show
+      @user = User.find(params[:id])
+      redirect_to root_url and return unless @user.activated?
+    end
   
-  def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User deleted"
-    redirect_to users_url
-  end
+    def destroy
+      User.find(params[:id]).destroy
+      flash[:success] = "User deleted"
+      redirect_to users_url
+    end
   
       # 管理者かどうか確認
-  def admin_user
+    def admin_user
       redirect_to(root_url) unless current_user.admin?
-  end
+    end
 end
