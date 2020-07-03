@@ -42,6 +42,23 @@ class UsersController < ApplicationController
     end
   end
   
+  def destroy
+    User.find(params[:id]).destroy
+    flash[:success] = "User deleted"
+    redirect_to users_url
+  end
+  
+        # 管理者かどうか確認
+  def admin_user
+    redirect_to(root_url) unless current_user.admin?
+  end
+  
+      # 正しいユーザーかどうか確認
+  def correct_user
+    @user = User.find(params[:id])
+    redirect_to(root_url) unless current_user?(@user)
+  end
+    
   private
   
     def user_params
@@ -60,12 +77,6 @@ class UsersController < ApplicationController
       end
     end
     
-    # 正しいユーザーかどうか確認
-    def correct_user
-      @user = User.find(params[:id])
-      redirect_to(root_url) unless current_user?(@user)
-    end
-    
     def index
     @users = User.where(activated: true).paginate(page: params[:page])
     end
@@ -74,15 +85,6 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       redirect_to root_url and return unless @user.activated?
     end
-  
-    def destroy
-      User.find(params[:id]).destroy
-      flash[:success] = "User deleted"
-      redirect_to users_url
-    end
-  
-      # 管理者かどうか確認
-    def admin_user
-      redirect_to(root_url) unless current_user.admin?
-    end
+    
+    
 end
