@@ -9,7 +9,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    redirect_to root_url and return unless @user.activated?
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
   
   def new
@@ -68,14 +68,6 @@ class UsersController < ApplicationController
     
     # beforeアクション
 
-    # ログイン済みユーザーかどうか確認
-    def logged_in_user
-      unless logged_in?
-        store_location
-        flash[:danger] = "Please log in."
-        redirect_to login_url
-      end
-    end
     
     def index
     @users = User.where(activated: true).paginate(page: params[:page])
