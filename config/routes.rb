@@ -17,9 +17,14 @@ Rails.application.routes.draw do
   get    '/login',   to: 'sessions#new'
   post   '/login',   to: 'sessions#create'
   delete '/logout',  to: 'sessions#destroy'
-  
-  resources :account_activations, only: [:edit]
+  resources :users do                       # usersリソースをRESTfullな構造にするためのコード。
+    member do
+      get :following, :followers
+    end
+  end
+  resources :account_activations, only: [:edit]    # editアクションのみaccount_activationsリソースを適用
   resources :users
-  resources :password_resets,     only: [:new, :create, :edit, :update]
-  resources :microposts,          only: [:create, :destroy]
+  resources :password_resets,     only: [:new, :create, :edit, :update]     # password再設定用のリソースを適用
+  resources :microposts,          only: [:create, :destroy]     # micropostsリソースをcreateとdestroyアクションにのみ適用
+  resources :relationships,       only: [:create, :destroy]
 end
